@@ -1,0 +1,17 @@
+server:
+  port: 8888
+
+# 上传文件配置
+upload:
+  # 选择要使用的文件存储服务
+  storage: minio
+  # minio服务文件域名（自定义，可以设置成你自己的域名）
+  host: http://127.0.0.1:9001
+  #minio服务地址
+  endpoint: http://127.0.0.1:9001
+  #用户名
+  accessKey: admin
+  #密码
+  secretKey: minioadmin
+  #桶名称
+  bucketName: files
