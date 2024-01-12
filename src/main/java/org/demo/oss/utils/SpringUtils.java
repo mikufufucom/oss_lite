@@ -4,19 +4,28 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
  * Spring工具类
  */
 @Component
-public class SpringUtils implements BeanFactoryAware {
+public class SpringUtils implements BeanFactoryAware, EnvironmentAware {
 
     private static BeanFactory bean;
+
+    private static Environment env;
 
     @Override
     public void setBeanFactory(@NotNull BeanFactory beanFactory) throws BeansException {
         bean = beanFactory;
+    }
+
+    @Override
+    public void setEnvironment(@NotNull Environment environment) {
+        env = environment;
     }
 
     /**
@@ -26,5 +35,14 @@ public class SpringUtils implements BeanFactoryAware {
      */
     public static <T> T getBean(Class<T> clazz) {
         return clazz == null ? null : bean.getBean(clazz);
+    }
+
+    /**
+     * 获取当前属性名对应的属性值
+     * @param key 属性名
+     * @return 属性值
+     */
+    public static String getProperty(String key) {
+        return env.getProperty(key);
     }
 }
