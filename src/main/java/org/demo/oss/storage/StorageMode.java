@@ -32,7 +32,7 @@ public interface StorageMode {
     /**
      * 文件下载 外链
      * @param objectName 文件名
-     * @return 文件的二进制流
+     * @return {@link InputStream} 文件的二进制流
      */
     InputStream download(String objectName);
 

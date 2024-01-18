@@ -131,7 +131,7 @@ public class ImageUtils {
 
     /**
      * 压缩图片
-     * @param inputStream 文件
+     * @param inputStream {@link InputStream} 文件流 实现时注意关闭流
      * @param width 宽度
      * @param height 高度
      * @return 压缩后的图片

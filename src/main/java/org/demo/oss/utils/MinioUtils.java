@@ -73,6 +73,13 @@ public class MinioUtils {
         }
     }
 
+    /**
+     * minio对象存储 上传文件
+     * @param inputStream {@link InputStream} 文件流 实现时注意关闭流
+     * @param pathName 文件路径
+     * @param objectName 文件名称
+     * @return 成功返回文件链接，失败返回失败的信息
+     */
     public static String upload(InputStream inputStream,String pathName,String objectName){
         try {
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()

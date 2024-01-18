@@ -93,6 +93,13 @@ public class OssUtils {
         return null;
     }
 
+    /**
+     * 阿里OSS服务 上传文件
+     * @param inputStream {@link InputStream}文件流 实现时注意关闭流
+     * @param pathName 文件路径
+     * @param objectName 文件名称
+     * @return 文件上传路径
+     */
     public static String upload(InputStream inputStream,String pathName,String objectName){
         try {
             getOssClient().putObject(
