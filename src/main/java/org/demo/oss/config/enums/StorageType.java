@@ -29,6 +29,11 @@ public enum StorageType {
 
     private final Class<? extends StorageMode> storageMode;
 
+    /**
+     * 获取存储方式
+     * @param type 存储方式
+     * @return {@link StorageMode} 存储方式
+     */
     public static StorageMode getStorageMode(String type){
         if(StringUtils.isBlank(type)){
             throw new RuntimeException("存储方式不能为空");
