@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.demo.oss.config.entity.OssProp;
 import org.demo.oss.storage.StorageMode;
 import org.demo.oss.utils.FileUtils;
+import org.demo.oss.utils.ImageUtils;
 import org.demo.oss.utils.SpringUtils;
 import org.demo.oss.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -43,6 +45,33 @@ public class LocalMode implements StorageMode {
             return host + "/" + pathName + "/" + objectName;
         } catch (Exception e) {
             log.error("文件上传失败", e);
+        }
+        return null;
+    }
+
+    @Override
+    public String upload(InputStream inputStream, String pathName, String objectName) {
+        try {
+            String filePath = uploadPath + pathName;
+            File file = new File(filePath);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            String fileName = filePath + "/" + objectName;
+            String suffix = ImageUtils.getImageSuffix(objectName);
+            BufferedImage bufferedImage = ImageIO.read(inputStream);
+            ImageIO.write(bufferedImage,suffix,new File(fileName));
+            return host + "/" + pathName + "/" + objectName;
+        } catch (Exception e) {
+            log.error("文件上传失败", e);
+        }finally {
+            if (null != inputStream){
+                try {
+                    inputStream.close();
+                }catch (Exception e){
+                    log.error("文件流关闭失败：{}",e.getMessage());
+                }
+            }
         }
         return null;
     }

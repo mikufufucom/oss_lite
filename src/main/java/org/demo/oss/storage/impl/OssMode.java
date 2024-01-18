@@ -1,5 +1,6 @@
 package org.demo.oss.storage.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.demo.oss.storage.StorageMode;
 import org.demo.oss.utils.OssUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,11 +12,25 @@ import java.util.Map;
 /**
  * 阿里OSS存储模式实现类
  */
+@Slf4j
 public class OssMode implements StorageMode {
 
     @Override
     public String upload(MultipartFile multipartFile, String pathName, String objectName) {
         return OssUtils.upload(multipartFile,pathName,objectName);
+    }
+
+    @Override
+    public String upload(InputStream inputStream, String pathName, String objectName) {
+        String url = OssUtils.upload(inputStream,pathName,objectName);
+        if (null != inputStream){
+            try {
+                inputStream.close();
+            }catch (Exception e){
+                log.error("文件流关闭失败：{}",e.getMessage());
+            }
+        }
+        return url;
     }
 
     @Override

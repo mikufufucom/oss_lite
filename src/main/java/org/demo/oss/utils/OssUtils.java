@@ -52,12 +52,13 @@ public class OssUtils {
         if (null == multipartFile || 0 == multipartFile.getSize()) {
             return null;
         }
-        OSS ossClient = getOssClient();
+        InputStream inputStream = null;
         try {
-            ossClient.putObject(
+            inputStream = multipartFile.getInputStream();
+            getOssClient().putObject(
                     getOssProp().getBucketName(),
                     pathName + "/" + objectName,
-                    multipartFile.getInputStream()
+                    inputStream
             );
             if (StringUtils.isBlank(pathName)) {
                 return getOssProp().getHost() + "/" + objectName;
@@ -80,6 +81,49 @@ public class OssUtils {
                     + "在尝试与OSS通信时出现了严重的内部问题，"
                     + "例如不能接入网络。");
             log.error("Error Message:" + ioe.getMessage());
+        }finally {
+            if (null != inputStream){
+                try {
+                    inputStream.close();
+                }catch (Exception e){
+                    log.error("文件流关闭失败：{}",e.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String upload(InputStream inputStream,String pathName,String objectName){
+        try {
+            getOssClient().putObject(
+                    getOssProp().getBucketName(),
+                    pathName + "/" + objectName,
+                    inputStream
+            );
+            if (StringUtils.isBlank(pathName)) {
+                return getOssProp().getHost() + "/" + objectName;
+            }
+            return getOssProp().getHost() + "/" + pathName + "/" + objectName;
+        } catch (OSSException oe){
+            log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
+                    + "但是由于某种原因以错误响应被拒绝。");
+            log.error("Error Message:" + oe.getErrorMessage());
+            log.error("Error Code:" + oe.getErrorCode());
+            log.error("Request ID:" + oe.getRequestId());
+            log.error("Host ID:" + oe.getHostId());
+        }catch (ClientException ce){
+            log.error("捕获ClientException，这意味着客户端遇到"
+                    + "在尝试与OSS通信时出现了严重的内部问题，"
+                    + "例如不能接入网络。");
+            log.error("Error Message:" + ce.getMessage());
+        } finally {
+            if (null != inputStream){
+                try {
+                    inputStream.close();
+                }catch (Exception e){
+                    log.error("文件流关闭失败：{}",e.getMessage());
+                }
+            }
         }
         return null;
     }
@@ -90,9 +134,8 @@ public class OssUtils {
      * @return 删除成功返回true，失败返回false
      */
     public static Boolean delete(String objectName) {
-        OSS ossClient = getOssClient();
         try {
-            ossClient.deleteObject(getOssProp().getBucketName(), objectName);
+            getOssClient().deleteObject(getOssProp().getBucketName(), objectName);
             return true;
         } catch (OSSException oe) {
             log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
@@ -116,9 +159,8 @@ public class OssUtils {
      * @return 文件的二进制流
      */
     public static InputStream download(String objectName) {
-        OSS ossClient = getOssClient();
         try {
-            return ossClient.getObject(getOssProp().getBucketName(), objectName).getObjectContent();
+            return getOssClient().getObject(getOssProp().getBucketName(), objectName).getObjectContent();
         } catch (OSSException oe) {
             log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
                     + "但是由于某种原因以错误响应被拒绝。");
@@ -143,9 +185,8 @@ public class OssUtils {
      * @return 文件外链
      */
     public static String getObjectUrl(String objectName, Integer duration, TimeUnit unit) {
-        OSS ossClient = getOssClient();
         try {
-            return ossClient.generatePresignedUrl(getOssProp().getBucketName(),
+            return getOssClient().generatePresignedUrl(getOssProp().getBucketName(),
                     objectName,
                     new Date(System.currentTimeMillis() + unit.toMillis(duration))
             ).toString();
@@ -181,12 +222,11 @@ public class OssUtils {
      * @return 对象列表信息
      */
     public static List<Map<String,String>> listObjects(String objectNamePrefix, Integer maxKeys) {
-        OSS ossClient = getOssClient();
         try {
             ListObjectsRequest listObjectsRequest = new ListObjectsRequest(getOssProp().getBucketName())
                     .withPrefix(objectNamePrefix)
                     .withMaxKeys(maxKeys);
-            ObjectListing objectListing = ossClient.listObjects(listObjectsRequest);
+            ObjectListing objectListing = getOssClient().listObjects(listObjectsRequest);
             List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
             return sums.stream().map(ossObject -> {
                 Map<String,String> map = new HashMap<>();

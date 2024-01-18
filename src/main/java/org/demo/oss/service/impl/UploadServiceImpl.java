@@ -5,6 +5,7 @@ import org.demo.oss.config.enums.StorageType;
 import org.demo.oss.config.enums.UploadFileType;
 import org.demo.oss.service.UploadService;
 import lombok.extern.slf4j.Slf4j;
+import org.demo.oss.utils.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,17 +33,38 @@ public class UploadServiceImpl implements UploadService {
     private OssProp ossProp;
 
     @Override
-    public String upload(MultipartFile multipartFile) {
+    public Map<String,String> upload(MultipartFile multipartFile) {
         // 将上传文件的类型转换成全大写
         String type = Objects.requireNonNull(multipartFile.getContentType()).split("/")[0].toUpperCase();
         return upload(multipartFile, UploadFileType.valueOf(type).getPath());
     }
 
     @Override
-    public String upload(MultipartFile multipartFile, String pathName) {
+    public Map<String,String> upload(MultipartFile multipartFile, String pathName) {
         String dateString = simpleDateFormat.format(System.currentTimeMillis());
         String fileName = dateString + "_" + multipartFile.getOriginalFilename();
-        return StorageType.getStorageMode(ossProp.getStorage()).upload(multipartFile,pathName,fileName);
+//        return StorageType.getStorageMode(ossProp.getStorage()).upload(multipartFile,pathName,fileName);
+        InputStream inputStream = null;
+        try {
+            inputStream = multipartFile.getInputStream();
+            String url = StorageType.getStorageMode(ossProp.getStorage()).upload(multipartFile,pathName,fileName);
+            String thumbUrl = StorageType.getStorageMode(ossProp.getStorage()).upload(ImageUtils.compressImageToInputStream(multipartFile,200,200),"thumb","thumb_" + fileName);
+            return new HashMap<String,String>(){{
+                put("url",url);
+                put("thumbUrl",thumbUrl);
+            }};
+        }catch (IOException io){
+            log.error(io.getMessage());
+        }finally {
+            if (null != inputStream){
+                try {
+                    inputStream.close();
+                }catch (Exception e){
+                    log.error("文件流关闭失败：{}",e.getMessage());
+                }
+            }
+        }
+        return null;
     }
 
     @Override

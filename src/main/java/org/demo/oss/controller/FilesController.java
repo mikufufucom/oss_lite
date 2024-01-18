@@ -31,7 +31,7 @@ public class FilesController {
      * @return 文件路径
      */
     @PostMapping("/upload")
-    public AjaxResult<String> upload(@RequestPart("file") MultipartFile file, String pathName){
+    public AjaxResult<Map<String,String>> upload(@RequestPart("file") MultipartFile file, String pathName){
         // 如果文件为空，则返回错误信息
         if (file.isEmpty()){
             return AjaxResult.error("文件不能为空");

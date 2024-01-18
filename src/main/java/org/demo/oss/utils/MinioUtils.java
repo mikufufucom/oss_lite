@@ -45,12 +45,14 @@ public class MinioUtils {
         if (null == multipartFile || 0 == multipartFile.getSize()) {
             return null;
         }
+        InputStream inputStream = null;
         try {
+            inputStream = multipartFile.getInputStream();
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                     .bucket(getOssProp().getBucketName())
                     .object(pathName + "/" + objectName)
                     .contentType(multipartFile.getContentType())
-                    .stream(multipartFile.getInputStream(), multipartFile.getSize(), -1)
+                    .stream(inputStream, multipartFile.getSize(), -1)
                     .build();
             getMinioClient().putObject(putObjectArgs);
             if (StringUtils.isBlank(pathName)) {
@@ -60,6 +62,40 @@ public class MinioUtils {
         } catch (Exception e) {
             log.error(e.getMessage());
             return null;
+        }finally {
+            if (null != inputStream){
+                try {
+                    inputStream.close();
+                }catch (Exception e){
+                    log.error("文件流关闭失败：{}",e.getMessage());
+                }
+            }
+        }
+    }
+
+    public static String upload(InputStream inputStream,String pathName,String objectName){
+        try {
+            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+                    .bucket(getOssProp().getBucketName())
+                    .object(pathName + "/" + objectName)
+                    .stream(inputStream,inputStream.available(),-1)
+                    .build();
+            getMinioClient().putObject(putObjectArgs);
+            if (StringUtils.isBlank(pathName)) {
+                return getOssProp().getHost() + "/" + getOssProp().getBucketName() + "/" + objectName;
+            }
+            return getOssProp().getHost() + "/" + getOssProp().getBucketName() + "/" + pathName + "/" + objectName;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }finally {
+            if (null != inputStream){
+                try {
+                    inputStream.close();
+                }catch (Exception e){
+                    log.error("文件流关闭失败：{}",e.getMessage());
+                }
+            }
         }
     }
 

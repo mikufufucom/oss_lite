@@ -16,7 +16,7 @@ public interface UploadService {
      * @param multipartFile 文件流
      * @return 文件资源链接
      */
-    String upload(MultipartFile multipartFile);
+    Map<String,String> upload(MultipartFile multipartFile);
 
     /**
      * 文件上传
@@ -24,7 +24,7 @@ public interface UploadService {
      * @param pathName 文件路径
      * @return 文件资源链接
      */
-    String upload(MultipartFile multipartFile,String pathName);
+    Map<String,String> upload(MultipartFile multipartFile,String pathName);
 
     /**
      * 文件下载 外链

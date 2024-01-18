@@ -21,6 +21,15 @@ public interface StorageMode {
     String upload(MultipartFile multipartFile,String pathName,String objectName);
 
     /**
+     * 文件上传
+     * @param inputStream 文件
+     * @param pathName 文件路径
+     * @param objectName 文件名
+     * @return 文件资源链接
+     */
+    String upload(InputStream inputStream,String pathName,String objectName);
+
+    /**
      * 文件下载 外链
      * @param objectName 文件名
      * @return 文件的二进制流
