@@ -2,7 +2,7 @@ package org.demo.oss.utils;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.demo.oss.config.MinioConfig;
+import org.demo.oss.config.OssConfig;
 import org.demo.oss.config.entity.OssProp;
 import io.minio.*;
 import io.minio.http.Method;
@@ -27,11 +27,11 @@ public class MinioUtils {
      * @return Minio客户端
      */
     private static MinioClient getMinioClient(){
-        return SpringUtils.getBean(MinioConfig.class).getMinioClient();
+        return SpringUtils.getBean(OssConfig.class).getMinioClient();
     }
 
     private static OssProp getOssProp(){
-        return SpringUtils.getBean(MinioConfig.class).getOssProp();
+        return SpringUtils.getBean(OssConfig.class).getOssProp();
     }
 
     /**

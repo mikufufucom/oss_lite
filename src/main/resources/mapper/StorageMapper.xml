@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.demo.oss.mapper.StorageMapper">
+  <resultMap id="BaseResultMap" type="org.demo.oss.model.Storage">
+    <!--@mbg.generated-->
+    <!--@Table `storage`-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="storage" jdbcType="VARCHAR" property="storage" />
+    <result column="storage_name" jdbcType="VARCHAR" property="storageName" />
+    <result column="host" jdbcType="VARCHAR" property="host" />
+    <result column="endpoint" jdbcType="VARCHAR" property="endpoint" />
+    <result column="access_key" jdbcType="VARCHAR" property="accessKey" />
+    <result column="secret_key" jdbcType="VARCHAR" property="secretKey" />
+    <result column="bucket_name" jdbcType="VARCHAR" property="bucketName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `storage`, storage_name, `host`, endpoint, access_key, secret_key, bucket_name
+  </sql>
+</mapper>

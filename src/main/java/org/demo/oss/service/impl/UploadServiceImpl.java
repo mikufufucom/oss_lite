@@ -3,9 +3,11 @@ package org.demo.oss.service.impl;
 import org.demo.oss.config.entity.OssProp;
 import org.demo.oss.config.enums.StorageType;
 import org.demo.oss.config.enums.UploadFileType;
+import org.demo.oss.service.SysSettingService;
 import org.demo.oss.service.UploadService;
 import lombok.extern.slf4j.Slf4j;
 import org.demo.oss.utils.ImageUtils;
+import org.demo.oss.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,17 @@ public class UploadServiceImpl implements UploadService {
 
     @Autowired
     private OssProp ossProp;
+    @Autowired
+    private SysSettingService settingService;
+
+    private String getStorage(){
+        String storage = settingService.getStorage();
+        if (!StringUtils.isBlank(storage)) {
+            log.info("当前存储服务商为：{}",storage);
+            return storage;
+        }
+        return ossProp.getStorage();
+    }
 
     @Override
     public Map<String,String> upload(MultipartFile multipartFile) {
@@ -43,12 +56,12 @@ public class UploadServiceImpl implements UploadService {
     public Map<String,String> upload(MultipartFile multipartFile, String pathName) {
         String dateString = simpleDateFormat.format(System.currentTimeMillis());
         String fileName = dateString + "_" + multipartFile.getOriginalFilename();
-//        return StorageType.getStorageMode(ossProp.getStorage()).upload(multipartFile,pathName,fileName);
+//        return StorageType.getStorageMode(getStorage()).upload(multipartFile,pathName,fileName);
         InputStream inputStream = null;
         try {
             inputStream = multipartFile.getInputStream();
-            String url = StorageType.getStorageMode(ossProp.getStorage()).upload(multipartFile,pathName,fileName);
-            String thumbUrl = StorageType.getStorageMode(ossProp.getStorage()).upload(ImageUtils.compressImageToInputStream(multipartFile,200,200),"thumb","thumb_" + fileName);
+            String url = StorageType.getStorageMode(getStorage()).upload(multipartFile,pathName,fileName);
+            String thumbUrl = StorageType.getStorageMode(getStorage()).upload(ImageUtils.compressImageToInputStream(multipartFile,200,200),"thumb","thumb_" + fileName);
             return new HashMap<String,String>(){{
                 put("url",url);
                 put("thumbUrl",thumbUrl);
@@ -69,19 +82,19 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public String download(String fileName) {
-        return StorageType.getStorageMode(ossProp.getStorage()).getObjectUrl(fileName);
+        return StorageType.getStorageMode(getStorage()).getObjectUrl(fileName);
     }
 
     @Override
     public Boolean delete(String fileName) {
-        return StorageType.getStorageMode(ossProp.getStorage()).delete(fileName);
+        return StorageType.getStorageMode(getStorage()).delete(fileName);
     }
 
     @Override
     public void downloadImage(String fileName, OutputStream outputStream) {
         InputStream stream = null;
         try {
-            stream = StorageType.getStorageMode(ossProp.getStorage()).download(fileName);
+            stream = StorageType.getStorageMode(getStorage()).download(fileName);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -99,6 +112,6 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public List<Map<String,String>> listObjects(String objectNamePrefix, Boolean isSubDir) {
-        return StorageType.getStorageMode(ossProp.getStorage()).listObjects(objectNamePrefix,isSubDir);
+        return StorageType.getStorageMode(getStorage()).listObjects(objectNamePrefix,isSubDir);
     }
 }

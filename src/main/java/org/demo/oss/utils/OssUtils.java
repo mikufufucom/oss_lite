@@ -34,7 +34,7 @@ public class OssUtils {
      * @return 阿里OSS客户端
      */
     private static OSS getOssClient(){
-        return SpringUtils.getBean(OssConfig.class).ossClient();
+        return SpringUtils.getBean(OssConfig.class).getOssClient();
     }
 
     private static OssProp getOssProp(){

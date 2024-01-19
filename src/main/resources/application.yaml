@@ -2,13 +2,28 @@ server:
   port: 8000
 
 # 上传文件配置
+spring:
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/static,classpath:/resources/,file:${web.resource-path}
+
+  # 数据库配置
+  datasource:
+    # 设置数据库驱动
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #      本地数据库
+    url: jdbc:mysql://127.0.0.1:3306/oss?characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+# 上传文件配置
 upload:
   # 选择要使用的文件存储服务
   storage: minio
-#  storage: local
+  #  storage: local
   # minio服务文件域名（自定义，可以设置成你自己的域名）
   host: http://127.0.0.1:9001
-#  host: http://localhost:8000
+  #  host: http://localhost:8000
   #minio服务地址
   endpoint: http://127.0.0.1:9001
   #用户名
@@ -21,9 +36,3 @@ upload:
 web:
   # 上传文件存储路径
   resource-path: D:/image/
-
-# 上传文件配置
-spring:
-  web:
-    resources:
-      static-locations: classpath:/META-INF/resources/,classpath:/static,classpath:/resources/,file:${web.resource-path}
