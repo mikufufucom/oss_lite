@@ -1,0 +1,96 @@
+#title{
+    text-align: center;
+    color: #000;
+    font-size: 30px;
+    margin: 20px 0;
+}
+/* 居中 */
+.main{
+    width: 60%;
+    height: 40%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px #ffc1e2;
+    background-image: url(https://oss.moxiaoli.cn/files/pixiv/61169484_p0.png);
+    background-size: cover;
+    background-repeat:no-repeat;
+    background-position: center;
+}
+.oss-title{
+    text-align: center;
+    color: #000;
+    font-size: 20px;
+    margin: 20px 0;
+}
+.oss-form{
+    width: 80%;
+    height: 80%;
+    background-color: rgba(255,255,255,0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px auto;
+    /* 隐藏超出部分 */
+    overflow: hidden;
+}
+/* 表单样式 */
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+li{
+    margin: 10px 0;
+}
+label{
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+}
+input,select{
+    width: 300px;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 0 10px;
+}
+/*select{*/
+/*    -webkit-appearance: none; // 去除默认样式*/
+/*    -moz-appearance: none; // 去除默认样式*/
+/*    !*appearance: none; // 去除默认样式*!*/
+/*}*/
+select option {
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: #333;
+}
+input:focus,select:focus{
+    outline: none;
+    border-color: #fd95d8;
+}
+input[type="submit"]{
+    width: 100px;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 0 10px;
+    background-color: #fff;
+    cursor: pointer;
+}
+input[type="submit"]:hover{
+    background-color: #ccc;
+}
+input[type="submit"]:active{
+    background-color: #999;
+}
+table{
+    width: 100%;
+}
+table td{
+    padding: 5px;
+}

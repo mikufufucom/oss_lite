@@ -16,6 +16,10 @@ spring:
     username: root
     password: 123456
 
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
+
 # 上传文件配置
 upload:
   # 选择要使用的文件存储服务

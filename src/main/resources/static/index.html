@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OSS管理页</title>
+    <script src="https://minio.moxiaoli.cn/files/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="./css/oss.css">
+</head>
+<body>
+<h1 id="title">OSS管理页</h1>
+<div class="main">
+    <div class="oss-form">
+        <form action="http://localhost:8000/storage/updateStorageSetting" method="post" enctype="multipart/form-data">
+            <ul>
+                <li>
+                    <h2 class="oss-title">存储服务配置</h2>
+                </li>
+                <li>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <label for="storage">
+                                    <span>存储服务</span>
+                                </label>
+                            </td>
+                            <td>
+                                <select name="storage" id="storage">
+                                    <option value="minio">MinIO</option>
+<!--                                    <option value="aliyun">阿里云OSS</option>-->
+<!--                                    <option value="tencent">腾讯云COS</option>-->
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="endpoint">
+                                    <span>存储服务API地址</span>
+                                </label>
+                            </td>
+                            <td>
+                                <input type="text" name="endpoint" id="endpoint" placeholder="存储服务API地址">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="host">
+                                    <span>服务的外链访问地址</span>
+                                </label>
+                            </td>
+                            <td>
+                                <input type="text" name="host" id="host" placeholder="服务的外链访问地址">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="accessKey">
+                                    <span>访问账户</span>
+                                </label>
+                            </td>
+                            <td>
+                                <input type="text" name="accessKey" id="accessKey" placeholder="访问账户">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="secretKey">
+                                    <span>访问密钥</span>
+                                </label>
+                            </td>
+                            <td>
+                                <input type="text" name="secretKey" id="secretKey" placeholder="访问密钥">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="bucketName">
+                                    <span>存储桶名称</span>
+                                </label>
+                            </td>
+                            <td>
+                                <input type="text" name="bucketName" id="bucketName" placeholder="存储桶名称">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li>
+                    <input type="submit" name="submit" value="提交" />
+                </li>
+            </ul>
+        </form>
+    </div>
+</div>
+<script type="module">
+    // import axios from 'https://unpkg.com/axios/dist/axios.min.js';
+    // window.onload 方法会在页面加载完成后执行
+    window.onload = function () {
+        let storage = document.getElementById('storage');
+        console.log('storage:', storage); // 打印storage元素
+        axios.get('http://localhost:8000/storage/list').then(res => {
+            let {data} = res.data;
+            console.log('res.data:', res.data.data); // 打印响应数据
+            // 清空下拉框
+            storage.innerHTML = '';
+            // 生成下拉框
+            for (let i = 0; i < data.length; i++) {
+                let option = document.createElement('option');
+                option.value = data[i].storage;
+                option.innerText = data[i].storageName;
+                storage.appendChild(option);
+            }
+        }).catch(error => {
+            console.error(error);
+        });
+        axios.get('http://localhost:8000/storage/getStorageSetting').then(res => {
+            let {data} = res.data;
+            document.getElementById('storage').value = data.storage;
+            document.getElementById('endpoint').value = data.endpoint;
+            document.getElementById('host').value = data.host;
+            document.getElementById('accessKey').value = data.accessKey;
+            document.getElementById('secretKey').value = data.secretKey;
+            document.getElementById('bucketName').value = data.bucketName;
+        }).catch(error => {
+            console.error(error);
+        });
+    }
+</script>
+</body>
+</html>
