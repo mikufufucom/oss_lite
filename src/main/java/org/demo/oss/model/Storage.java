@@ -12,7 +12,6 @@ import lombok.Data;
  * 存储桶表
  */
 @Data
-@AllArgsConstructor
 @TableName(value = "`storage`")
 public class Storage implements Serializable {
     @TableId(value = "id", type = IdType.INPUT)

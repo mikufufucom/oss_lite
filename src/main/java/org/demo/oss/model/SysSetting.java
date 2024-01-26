@@ -12,7 +12,6 @@ import lombok.Data;
  * 系统设置表
  */
 @Data
-@AllArgsConstructor
 @TableName(value = "sys_setting")
 public class SysSetting implements Serializable {
     @TableId(value = "id", type = IdType.INPUT)
