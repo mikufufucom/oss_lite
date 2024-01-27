@@ -12,9 +12,10 @@
     <result column="access_key" jdbcType="VARCHAR" property="accessKey" />
     <result column="secret_key" jdbcType="VARCHAR" property="secretKey" />
     <result column="bucket_name" jdbcType="VARCHAR" property="bucketName" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, `storage`, storage_name, `host`, endpoint, access_key, secret_key, bucket_name
+    id, `storage`, storage_name, `host`, endpoint, access_key, secret_key, bucket_name, icon
   </sql>
 </mapper>

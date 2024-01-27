@@ -59,5 +59,11 @@ public class Storage implements Serializable {
     @TableField(value = "bucket_name")
     private String bucketName;
 
+    /**
+     * icon的url链接
+     */
+    @TableField(value = "icon")
+    private String icon;
+
     private static final long serialVersionUID = 1L;
 }

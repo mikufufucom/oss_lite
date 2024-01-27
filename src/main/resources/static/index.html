@@ -5,12 +5,15 @@
     <title>OSS管理页</title>
     <script src="https://minio.moxiaoli.cn/files/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="./css/oss.css">
+    <link rel="stylesheet" href="./css/select.css">
 </head>
 <body>
 <h1 id="title">OSS管理页</h1>
 <div class="main">
     <div class="oss-form">
-        <form action="/storage/updateStorageSetting" method="post" enctype="multipart/form-data">
+<!--        <form action="/storage/updateStorageSetting" method="post" enctype="multipart/form-data">-->
+<!--        这里不使用form表单，使用ajax提交-->
+        <form>
             <ul>
                 <li>
                     <h2 class="oss-title">存储服务配置</h2>
@@ -25,11 +28,89 @@
                                 </label>
                             </td>
                             <td>
-                                <select name="storage" id="storage">
+<!--                                <select name="storage" id="storage">-->
 <!--                                    <option value="minio">MinIO</option>-->
-                                    <option style="background-color: red;display: block" value="aliyun">阿里云OSS</option>
+<!--                                    <option value="aliyun">阿里云OSS</option>-->
 <!--                                    <option value="tencent">腾讯云COS</option>-->
-                                </select>
+<!--                                </select>-->
+                                <div id="box" onmouseleave="leaveOption()">
+                                    <div id="select" onmouseover="overOption()">
+                                        <label>
+                                            <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
+                                        </label>
+                                    </div>
+                                    <ul id="option">
+                                        <!--        <li>本地搭建的MinIO</li>-->
+                                        <!--        <li>阿里云OSS</li>-->
+                                        <!--        <li>腾讯云COS</li>-->
+                                    </ul>
+                                </div>
+                                <script>
+                                    let storageList = [];
+                                    function getStorageList() {
+                                        let storage = document.getElementById('option');
+                                        let select = document.getElementById('select');
+                                        let input = select.getElementsByTagName('input')[0];
+                                        axios.get('/storage/list').then(res => {
+                                            const {data} = res.data;
+                                            // 清空下拉框
+                                            // storage.innerHTML = '';
+                                            // 获取下拉框中的输入框的数据
+                                            // input.value = data[0].storageName;
+                                            // 生成下拉框
+                                            storageList = data;
+                                            for (let i = 0; i < data.length; i++) {
+                                                let option = document.createElement('li');
+                                                option.value = data[i].storage;
+                                                option.innerText = data[i].storageName;
+                                                option.onclick = function () {
+                                                    input.value = option.innerText;
+                                                    getStorageInfo(option.innerText);
+                                                    leaveOption();
+                                                }
+                                                option.style.backgroundImage = 'url(' + data[i].icon + ')';
+                                                storage.appendChild(option);
+                                            }
+                                        }).catch(error => {
+                                            console.error(error);
+                                        });
+                                    }
+                                    getStorageList();
+                                    function leaveOption() {
+                                        let option = document.getElementById('option');
+                                        option.style.display = 'none';
+                                    }
+                                    function overOption() {
+                                        let option = document.getElementById('option');
+                                        option.style.display = 'block';
+                                    }
+                                    function getStorageInfo(storageName) {
+                                        let storage = '';
+                                        for (let i = 0; i < storageList.length; i++) {
+                                            if (storageList[i].storageName === storageName) {
+                                                storage = storageList[i].storage;
+                                            }
+                                        }
+                                        axios.get('/storage/getStorageInfo', {
+                                            params: {
+                                                storage: storage
+                                            }
+                                        }).then(res => {
+                                            const {data} = res.data;
+                                            let select = document.getElementById('select');
+                                            let input = select.getElementsByTagName('input')[0];
+                                            input.value = data.storageName;
+                                            select.style.backgroundImage = 'url(' + data.icon + ')';
+                                            document.getElementById('endpoint').value = data.endpoint;
+                                            document.getElementById('host').value = data.host;
+                                            document.getElementById('accessKey').value = data.accessKey;
+                                            document.getElementById('secretKey').value = data.secretKey;
+                                            document.getElementById('bucketName').value = data.bucketName;
+                                        }).catch(error => {
+                                            console.error(error);
+                                        });
+                                    }
+                                </script>
                             </td>
                         </tr>
                         <tr>
@@ -82,24 +163,34 @@
                                 <input type="text" name="bucketName" id="bucketName" placeholder="存储桶名称">
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+<!--                                <button type="button" onclick="updateStorageSetting()">更新配置</button>-->
+<!--                                <input type="submit" name="submit" value="提交" onclick="updateStorageSetting()"/>-->
+                                <div class="button" onclick="updateStorageSetting()">更新配置</div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
-                </li>
-                <li>
-                    <input type="submit" name="submit" value="提交" />
                 </li>
             </ul>
         </form>
     </div>
 </div>
-<script>
+<script type="text/javascript">
     // window.onload 方法会在页面加载完成后执行
     window.onload = function () {
-        getStorageList();
         getStorageSetting();
     }
     function updateStorageSetting() {
-        let storage = document.getElementById('storage').value;
+        let storage = '';
+        for (let i = 0; i < storageList.length; i++) {
+            if (storageList[i].storageName === document.getElementById('storage').value) {
+                storage = storageList[i].storage;
+            }
+        }
         let endpoint = document.getElementById('endpoint').value;
         let host = document.getElementById('host').value;
         let accessKey = document.getElementById('accessKey').value;
@@ -118,29 +209,13 @@
             console.error(error);
         });
     }
-    function getStorageList() {
-        let storage = document.getElementById('storage');
-        console.log('storage:', storage); // 打印storage元素
-        axios.get('/storage/list').then(res => {
-            const {data} = res.data;
-            console.log('res.data:', res.data.data); // 打印响应数据
-            // // 清空下拉框
-            storage.innerHTML = '';
-            // 生成下拉框
-            for (let i = 0; i < data.length; i++) {
-                let option = document.createElement('option');
-                option.value = data[i].storage;
-                option.innerText = data[i].storageName;
-                storage.appendChild(option);
-            }
-        }).catch(error => {
-            console.error(error);
-        });
-    }
     function getStorageSetting() {
         axios.get('/storage/getStorageSetting').then(res => {
             const {data} = res.data;
-            document.getElementById('storage').value = data.storage;
+            let select = document.getElementById('select');
+            let input = select.getElementsByTagName('input')[0];
+            input.value = data.storageName;
+            select.style.backgroundImage = 'url(' + data.icon + ')';
             document.getElementById('endpoint').value = data.endpoint;
             document.getElementById('host').value = data.host;
             document.getElementById('accessKey').value = data.accessKey;

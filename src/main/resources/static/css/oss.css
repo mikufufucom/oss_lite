@@ -15,7 +15,7 @@
     border-radius: 15px;
     border: 2px solid #fff;
     box-shadow: 0 0 10px #ffc1e2;
-    background-image: url(https://oss.moxiaoli.cn/files/pixiv/61169484_p0.png);
+    background-image: url(../image/61169484_p0.png);
     background-size: cover;
     background-repeat:no-repeat;
     background-position: center;
@@ -33,7 +33,7 @@
     backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 20px;
-    margin: 10px auto;
+    margin: 30px auto;
     /* 隐藏超出部分 */
     overflow: hidden;
 }
@@ -51,45 +51,38 @@ label{
     width: 150px;
     text-align: right;
 }
-input,select{
+input{
     width: 300px;
     height: 30px;
     border-radius: 5px;
     border: 1px solid #ccc;
     padding: 0 10px;
 }
-/*select{*/
-/*    -webkit-appearance: none; // 去除默认样式*/
-/*    -moz-appearance: none; // 去除默认样式*/
-/*    !*appearance: none; // 去除默认样式*!*/
-/*}*/
-select option {
-    font-size: 16px;
-    font-family: Arial, sans-serif;
-    font-weight: normal;
-    color: #333;
-}
-input:focus,select:focus{
+input:focus{
     outline: none;
     border-color: #fd95d8;
 }
-input[type="submit"]{
+.button{
     width: 100px;
     height: 30px;
     border-radius: 5px;
     border: 1px solid #ccc;
     padding: 0 10px;
+    line-height: 30px;
+    text-align: center;
     background-color: #fff;
     cursor: pointer;
 }
-input[type="submit"]:hover{
+.button:hover{
     background-color: #ccc;
 }
-input[type="submit"]:active{
+.button:active{
     background-color: #999;
 }
 table{
     width: 100%;
+    position: relative;
+    z-index: 1000;
 }
 table td{
     padding: 5px;

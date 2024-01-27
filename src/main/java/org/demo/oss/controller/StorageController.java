@@ -37,6 +37,18 @@ public class StorageController {
         return AjaxResult.data(storageServiceImpl.getOne(new LambdaQueryWrapper<Storage>().eq(Storage::getStorage,storage)));
     }
 
+    /**
+     * 获取存储服务商信息
+     * @return 存储服务商信息
+     */
+    @GetMapping("/getStorageInfo")
+    public AjaxResult<Storage> storageInfo(String storage){
+        if (StringUtils.isBlank(storage)){
+            return AjaxResult.error("存储服务商不能为空");
+        }
+        return AjaxResult.data(storageServiceImpl.getOne(new LambdaQueryWrapper<Storage>().eq(Storage::getStorage,storage)));
+    }
+
     @GetMapping("/list")
     public AjaxResult<List<Storage>> list(){
         return AjaxResult.data(storageServiceImpl.list());
@@ -47,7 +59,7 @@ public class StorageController {
      * @return 存储服务商
      */
     @PostMapping("/updateStorageSetting")
-    public AjaxResult<String> storage(Storage storage){
+    public AjaxResult<String> storage(@RequestBody Storage storage){
         boolean flag = false;
         if (storage!=null){
             if(StringUtils.isBlank(storage.getStorage())){

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select</title>
+    <script src="https://minio.moxiaoli.cn/files/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="../css/select.css">
+</head>
+<body>
+<div id="box" onmouseleave="leaveOption()">
+    <div id="select" onmouseover="overOption()">
+        <label>
+            <input type="text" placeholder="请选择" readonly="readonly">
+        </label>
+    </div>
+    <ul id="option">
+<!--        <li>本地搭建的MinIO</li>-->
+<!--        <li>阿里云OSS</li>-->
+<!--        <li>腾讯云COS</li>-->
+    </ul>
+    <script>
+        let flag = false;
+        function getStorageList() {
+            let storage = document.getElementById('option');
+            let select = document.getElementById('select');
+            let input = select.getElementsByTagName('input')[0];
+            axios.get('http://localhost:8000/storage/list').then(res => {
+                const {data} = res.data;
+                // 清空下拉框
+                // storage.innerHTML = '';
+                // 获取下拉框中的输入框的数据
+                input.value = data[0].storageName;
+                // 生成下拉框
+                for (let i = 0; i < data.length; i++) {
+                    let option = document.createElement('li');
+                    option.value = data[i].storage;
+                    option.innerText = data[i].storageName;
+                    option.onclick = function () {
+                        input.value = option.innerText;
+                        leaveOption();
+                    }
+                    storage.appendChild(option);
+                }
+            }).catch(error => {
+                console.error(error);
+            });
+        }
+        getStorageList();
+        function leaveOption() {
+            let option = document.getElementById('option');
+            option.style.display = 'none';
+            flag = false;
+        }
+        function overOption() {
+            let option = document.getElementById('option');
+            option.style.display = 'block';
+            flag = true;
+        }
+    </script>
+</div>
+</body>
+</html>
