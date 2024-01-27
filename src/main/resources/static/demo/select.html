@@ -10,7 +10,7 @@
 <div id="box" onmouseleave="leaveOption()">
     <div id="select" onmouseover="overOption()">
         <label>
-            <input type="text" placeholder="请选择" readonly="readonly">
+            <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
         </label>
     </div>
     <ul id="option">
@@ -19,7 +19,7 @@
 <!--        <li>腾讯云COS</li>-->
     </ul>
     <script>
-        let flag = false;
+        let storageList = [];
         function getStorageList() {
             let storage = document.getElementById('option');
             let select = document.getElementById('select');
@@ -30,15 +30,19 @@
                 // storage.innerHTML = '';
                 // 获取下拉框中的输入框的数据
                 input.value = data[0].storageName;
-                // 生成下拉框
+                select.style.backgroundImage = 'url(' + data[0].icon + ')';
+                // 生成下拉框中的选项
+                storageList = data;
                 for (let i = 0; i < data.length; i++) {
                     let option = document.createElement('li');
                     option.value = data[i].storage;
                     option.innerText = data[i].storageName;
                     option.onclick = function () {
                         input.value = option.innerText;
+                        getStorageInfo(option.innerText);
                         leaveOption();
                     }
+                    option.style.backgroundImage = 'url(' + data[i].icon + ')';
                     storage.appendChild(option);
                 }
             }).catch(error => {
@@ -49,12 +53,36 @@
         function leaveOption() {
             let option = document.getElementById('option');
             option.style.display = 'none';
-            flag = false;
         }
         function overOption() {
             let option = document.getElementById('option');
             option.style.display = 'block';
-            flag = true;
+        }
+        function getStorageInfo(storageName) {
+            let storage = '';
+            for (let i = 0; i < storageList.length; i++) {
+                if (storageList[i].storageName === storageName) {
+                    storage = storageList[i].storage;
+                }
+            }
+            axios.get('http://localhost:8000/storage/getStorageInfo', {
+                params: {
+                    storage: storage
+                }
+            }).then(res => {
+                const {data} = res.data;
+                let select = document.getElementById('select');
+                let input = select.getElementsByTagName('input')[0];
+                input.value = data.storageName;
+                select.style.backgroundImage = 'url(' + data.icon + ')';
+                document.getElementById('endpoint').value = data.endpoint;
+                document.getElementById('host').value = data.host;
+                document.getElementById('accessKey').value = data.accessKey;
+                document.getElementById('secretKey').value = data.secretKey;
+                document.getElementById('bucketName').value = data.bucketName;
+            }).catch(error => {
+                console.error(error);
+            });
         }
     </script>
 </div>
