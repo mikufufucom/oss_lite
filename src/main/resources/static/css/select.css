@@ -24,7 +24,7 @@
     background-repeat: no-repeat;
     background-position: 10px 5px;
     display: flex;
-    position: relative;
+    justify-content: space-between;
 }
 #select:hover {
     color: #333333;
@@ -72,8 +72,9 @@
     background-color: #ccc;
 }
 .s-icon {
-    position: absolute;
-    right: 10px;
     font-size: 25px;
     height: 100%;
+}
+#select>label{
+    flex: 1;
 }

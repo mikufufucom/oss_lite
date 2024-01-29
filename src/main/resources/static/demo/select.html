@@ -8,7 +8,7 @@
 </head>
 <body>
 <div id="box">
-    <div id="select" onclick="overOption()">
+    <div id="select" onclick="showOption()">
         <label for="storage">
             <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
         </label>
@@ -22,6 +22,7 @@
 <!--        <li>腾讯云COS</li>-->
     </ul>
     <script>
+        let flag = false;
         let storageList = [];
         function getStorageList() {
             let storage = document.getElementById('option');
@@ -75,12 +76,21 @@
             option.style.display = 'none';
             let svg = document.getElementsByClassName('s-icon')[0];
             svg.style.transform = 'rotate(0deg)';
+            flag = false;
         }
         function overOption() {
             let option = document.getElementById('option');
             option.style.display = 'block';
             let svg = document.getElementsByClassName('s-icon')[0];
             svg.style.transform = 'rotate(180deg)';
+            flag = true;
+        }
+        function showOption() {
+            if (flag) {
+                leaveOption();
+            } else {
+                overOption();
+            }
         }
         function getStorageInfo(storageName) {
             let storage = '';
