@@ -66,10 +66,10 @@
     /*background-position: 98% center;*/
 }
 #option li:hover {
-    background-color: #ccc;
+    background-color: #999;
 }
 .background-mask {
-    background-color: #ffc1e2;
+    background-color: #ccc;
 }
 .s-icon {
     position: absolute;
