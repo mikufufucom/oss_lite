@@ -11,7 +11,7 @@
  Target Server Version : 80032 (8.0.32)
  File Encoding         : 65001
 
- Date: 19/01/2024 16:21:37
+ Date: 29/01/2024 14:15:34
 */
 
 create database IF NOT EXISTS `oss` default character set utf8mb4 COLLATE utf8mb4_0900_ai_ci;
@@ -34,13 +34,15 @@ CREATE TABLE `storage`  (
   `access_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '账号或者用户识别码',
   `secret_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '密钥',
   `bucket_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '存储桶名称',
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'icon的url链接',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '存储桶表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '存储桶表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of storage
 -- ----------------------------
-INSERT INTO `storage` VALUES (1, 'minio', 'minio存储', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'admin', 'minioadmin', 'files');
+INSERT INTO `storage` VALUES (1, 'minio', 'minIO存储', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'admin', 'minioadmin', 'files', 'https://minio.moxiaoli.cn/files/icon/minio.png');
+INSERT INTO `storage` VALUES (2, 'oss', '阿里oss存储服务', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'minioadmin', 'minioadmin', 'files', 'https://minio.moxiaoli.cn/files/icon/%E9%98%BF%E9%87%8COSS.png');
 
 -- ----------------------------
 -- Table structure for sys_setting
