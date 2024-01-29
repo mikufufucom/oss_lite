@@ -23,6 +23,8 @@
     background-color: #fff;
     background-repeat: no-repeat;
     background-position: 10px 5px;
+    display: flex;
+    position: relative;
 }
 #select:hover {
     color: #333333;
@@ -56,6 +58,7 @@
     list-style: none;
     line-height: 30px;
     border-radius: 5px;
+    margin: 10px 0;
     /* 小图标的大小 */
     background-size: 25px 25px;
     background-repeat: no-repeat;
@@ -67,4 +70,10 @@
 }
 .background-mask {
     background-color: #ffc1e2;
+}
+.s-icon {
+    position: absolute;
+    right: 10px;
+    font-size: 25px;
+    height: 100%;
 }

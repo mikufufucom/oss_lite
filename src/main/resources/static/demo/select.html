@@ -9,9 +9,12 @@
 <body>
 <div id="box">
     <div id="select" onclick="overOption()">
-        <label>
+        <label for="storage">
             <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
         </label>
+        <span>
+            <svg class="s-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.75 5.7998L7.99274 10.0425L12.2361 5.79921" stroke="black" stroke-opacity="0.9" stroke-width="1.3"></path></svg>
+        </span>
     </div>
     <ul id="option">
 <!--        <li>本地搭建的MinIO</li>-->
@@ -70,10 +73,14 @@
         function leaveOption() {
             let option = document.getElementById('option');
             option.style.display = 'none';
+            let svg = document.getElementsByClassName('s-icon')[0];
+            svg.style.transform = 'rotate(0deg)';
         }
         function overOption() {
             let option = document.getElementById('option');
             option.style.display = 'block';
+            let svg = document.getElementsByClassName('s-icon')[0];
+            svg.style.transform = 'rotate(180deg)';
         }
         function getStorageInfo(storageName) {
             let storage = '';

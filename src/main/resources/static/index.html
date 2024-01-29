@@ -33,6 +33,9 @@
                                         <label>
                                             <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
                                         </label>
+                                        <span>
+                                            <svg t="1706513472258" class="s-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1429" width="16" height="16"><path d="M511.9 819c-21.7 0-43.4-8.3-59.9-24.8-33.1-33.1-33.1-86.7 0-119.8l363.5-344.7c33.1-33.1 86.7-33.1 119.8 0s33.1 86.7 0 119.8L571.7 794.2c-16.5 16.6-38.2 24.8-59.8 24.8z" fill="#666666" p-id="1430"></path><path d="M512.1 819c21.7 0 43.4-8.3 59.9-24.8 33.1-33.1 33.1-86.7 0-119.8L208.5 329.8c-33.1-33.1-86.7-33.1-119.8 0s-33.1 86.7 0 119.8l363.5 344.7c16.6 16.5 38.3 24.7 59.9 24.7z" fill="#666666" p-id="1431"></path></svg>
+                                        </span>
                                     </div>
                                     <ul id="option">
                                     </ul>
@@ -73,10 +76,14 @@
                                     function leaveOption() {
                                         let option = document.getElementById('option');
                                         option.style.display = 'none';
+                                        let svg = document.getElementsByClassName('s-icon')[0];
+                                        svg.style.transform = 'rotate(0deg)';
                                     }
                                     function overOption() {
                                         let option = document.getElementById('option');
                                         option.style.display = 'block';
+                                        let svg = document.getElementsByClassName('s-icon')[0];
+                                        svg.style.transform = 'rotate(180deg)';
                                     }
                                     function getStorageInfo(storageName) {
                                         let storage = '';
