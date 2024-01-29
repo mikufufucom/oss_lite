@@ -20,7 +20,7 @@
     padding: 0 10px;
     /* 小图标的大小 */
     background-size: 25px 25px;
-    background-color: white;
+    background-color: #fff;
     background-repeat: no-repeat;
     background-position: 10px 5px;
 }
@@ -44,16 +44,17 @@
     display: none;
     width: 100%;
     text-align: center;
-    line-height: 30px;
-    background: white;
-    border: 1px solid #ccc;
+    background: #fff;
     border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
     cursor: pointer;
     padding: 0 10px;
     /*overflow: hidden;*/
 }
 #option li {
     list-style: none;
+    line-height: 30px;
     border-radius: 5px;
     /* 小图标的大小 */
     background-size: 25px 25px;
@@ -63,4 +64,7 @@
 }
 #option li:hover {
     background-color: #ccc;
+}
+.background-mask {
+    background-color: #ffc1e2;
 }

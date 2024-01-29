@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="../css/select.css">
 </head>
 <body>
-<div id="box" onmouseleave="leaveOption()">
-    <div id="select" onmouseover="overOption()">
+<div id="box">
+    <div id="select" onclick="overOption()">
         <label>
             <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
         </label>
@@ -39,6 +39,23 @@
                     option.innerText = data[i].storageName;
                     option.onclick = function () {
                         input.value = option.innerText;
+                        // 方法一
+                        // let items = storage.getElementsByTagName('li');
+                        // for (let j = 0; j < items.length; j++) {
+                        //     if(items[j].innerText !== option.innerText){
+                        //         items[j].style.backgroundColor = '#fff';
+                        //     }else{
+                        //         items[j].style.backgroundColor = '#ff0000';
+                        //     }
+                        // }
+                        // 方法二
+                        Array.from(storage.getElementsByTagName('li')).forEach(function (item) {
+                            if (item.innerText === option.innerText) {
+                                item.classList.add('background-mask');
+                            } else {
+                                item.classList.remove('background-mask');
+                            }
+                        });
                         getStorageInfo(option.innerText);
                         leaveOption();
                     }
@@ -75,14 +92,38 @@
                 let input = select.getElementsByTagName('input')[0];
                 input.value = data.storageName;
                 select.style.backgroundImage = 'url(' + data.icon + ')';
-                document.getElementById('endpoint').value = data.endpoint;
-                document.getElementById('host').value = data.host;
-                document.getElementById('accessKey').value = data.accessKey;
-                document.getElementById('secretKey').value = data.secretKey;
-                document.getElementById('bucketName').value = data.bucketName;
-            }).catch(error => {
-                console.error(error);
             });
+            document.onclick = function (event) {
+                const e = event || window.event;
+                let target = e.target || e.srcElement;
+                // 方法一
+                // while(target)
+                // {
+                //     if(target.id === "box")  // 这里就是除这个id外点击其他地方执行下面HiddenDiv方法
+                //     {
+                //         return;
+                //     }
+                //     target = target.parentNode;
+                // }
+                // leaveOption();
+                // 方法二 如果你的目标浏览器支持ES6及以上，可以使用 Element.closest() 方法来简化代码。这个方法会沿DOM树向上遍历，直到找到匹配给定选择器的元素。
+                if (!target.closest('#box')) {
+                    leaveOption();
+                }
+                // 方法三 使用 Node.contains() 来检查点击事件是否发生在 box 或其子元素上。
+                // let box = document.getElementById('box');
+                // if (box && !box.contains(target)) {
+                //     leaveOption();
+                // }
+
+            }
+            // 方法四 使用 addEventListener 来添加事件监听器而不是直接在 document 对象上设置 onclick 属性。
+            // document.addEventListener('click', function (event) {
+            //     const target = event.target;
+            //     if (!target.closest('#box')) {
+            //         leaveOption();
+            //     }
+            // });
         }
     </script>
 </div>

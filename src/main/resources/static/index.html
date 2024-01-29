@@ -28,21 +28,13 @@
                                 </label>
                             </td>
                             <td>
-<!--                                <select name="storage" id="storage">-->
-<!--                                    <option value="minio">MinIO</option>-->
-<!--                                    <option value="aliyun">阿里云OSS</option>-->
-<!--                                    <option value="tencent">腾讯云COS</option>-->
-<!--                                </select>-->
-                                <div id="box" onmouseleave="leaveOption()">
-                                    <div id="select" onmouseover="overOption()">
+                                <div id="box">
+                                    <div id="select" onclick="overOption()">
                                         <label>
                                             <input id="storage" type="text" placeholder="请选择" readonly="readonly"/>
                                         </label>
                                     </div>
                                     <ul id="option">
-                                        <!--        <li>本地搭建的MinIO</li>-->
-                                        <!--        <li>阿里云OSS</li>-->
-                                        <!--        <li>腾讯云COS</li>-->
                                     </ul>
                                 </div>
                                 <script>
@@ -53,11 +45,6 @@
                                         let input = select.getElementsByTagName('input')[0];
                                         axios.get('/storage/list').then(res => {
                                             const {data} = res.data;
-                                            // 清空下拉框
-                                            // storage.innerHTML = '';
-                                            // 获取下拉框中的输入框的数据
-                                            // input.value = data[0].storageName;
-                                            // 生成下拉框
                                             storageList = data;
                                             for (let i = 0; i < data.length; i++) {
                                                 let option = document.createElement('li');
@@ -65,6 +52,13 @@
                                                 option.innerText = data[i].storageName;
                                                 option.onclick = function () {
                                                     input.value = option.innerText;
+                                                    Array.from(storage.getElementsByTagName('li')).forEach(function (item) {
+                                                        if (item.innerText === option.innerText) {
+                                                            item.classList.add('background-mask');
+                                                        } else {
+                                                            item.classList.remove('background-mask');
+                                                        }
+                                                    });
                                                     getStorageInfo(option.innerText);
                                                     leaveOption();
                                                 }
@@ -110,6 +104,13 @@
                                             console.error(error);
                                         });
                                     }
+                                    // 方法四 使用 addEventListener 来添加事件监听器而不是直接在 document 对象上设置 onclick 属性。
+                                    document.addEventListener('click', function (event) {
+                                        const target = event.target;
+                                        if (!target.closest('#box')) {
+                                            leaveOption();
+                                        }
+                                    });
                                 </script>
                             </td>
                         </tr>
@@ -167,8 +168,7 @@
                             <td>
                             </td>
                             <td>
-<!--                                <button type="button" onclick="updateStorageSetting()">更新配置</button>-->
-<!--                                <input type="submit" name="submit" value="提交" onclick="updateStorageSetting()"/>-->
+<!--                                <input type="submit" name="submit" value="提交" />-->
                                 <div class="button" onclick="updateStorageSetting()">更新配置</div>
                             </td>
                         </tr>
