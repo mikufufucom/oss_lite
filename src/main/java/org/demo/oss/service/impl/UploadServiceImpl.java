@@ -38,7 +38,7 @@ public class UploadServiceImpl implements UploadService {
             log.info("当前存储服务商为：{}",storage);
             return storage;
         }
-        return null;
+        return "local";
     }
 
     @Override
