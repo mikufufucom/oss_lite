@@ -17,10 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public enum StorageType {
 
-//    local("local"),
-//    minio("minio"),
-//    oss("oss");
-
     local("local", LocalMode.class),
     minio("minio", MinioMode.class),
     aliyun("oss", OssMode.class);
