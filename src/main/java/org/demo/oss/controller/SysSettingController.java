@@ -22,9 +22,4 @@ public class SysSettingController {
     public AjaxResult<SysSetting> get(String code){
         return AjaxResult.data(sysSettingServiceImpl.getOne(new LambdaQueryWrapper<SysSetting>().eq(SysSetting::getCode,code)));
     }
-
-    @GetMapping("/test")
-    public AjaxResult<String> test(){
-        return AjaxResult.data(SpringUtils.getHost());
-    }
 }
