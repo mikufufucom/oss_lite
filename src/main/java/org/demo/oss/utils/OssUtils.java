@@ -1,7 +1,7 @@
 package org.demo.oss.utils;
 
-import org.demo.oss.config.OssConfig;
-import org.demo.oss.config.entity.OssProp;
+import com.aliyun.oss.OSSClientBuilder;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
@@ -9,6 +9,8 @@ import com.aliyun.oss.model.ListObjectsRequest;
 import com.aliyun.oss.model.OSSObjectSummary;
 import com.aliyun.oss.model.ObjectListing;
 import lombok.extern.slf4j.Slf4j;
+import org.demo.oss.model.Storage;
+import org.demo.oss.service.StorageService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -33,12 +35,20 @@ public class OssUtils {
      * 获取配置的阿里OSS客户端
      * @return 阿里OSS客户端
      */
-    private static OSS getOssClient(){
-        return SpringUtils.getBean(OssConfig.class).getOssClient();
+    public static OSS getOssClient(){
+        Storage storage = getOssProp();
+        if (storage != null) {
+            return new OSSClientBuilder().build(
+                    storage.getEndpoint(),
+                    storage.getAccessKey(),
+                    storage.getSecretKey()
+            );
+        }
+        return null;
     }
 
-    private static OssProp getOssProp(){
-        return SpringUtils.getBean(OssConfig.class).getOssProp();
+    private static Storage getOssProp(){
+        return SpringUtils.getBean(StorageService.class).getOne(new QueryWrapper<Storage>().lambda().eq(Storage::getStorage, "oss"));
     }
 
     /**

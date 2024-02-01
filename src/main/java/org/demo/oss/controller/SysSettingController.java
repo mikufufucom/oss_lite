@@ -1,5 +1,9 @@
 package org.demo.oss.controller;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.demo.oss.model.AjaxResult;
+import org.demo.oss.model.SysSetting;
 import org.demo.oss.service.impl.SysSettingServiceImpl;
+import org.demo.oss.utils.SpringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,4 +18,13 @@ public class SysSettingController {
     @Autowired
     private SysSettingServiceImpl sysSettingServiceImpl;
 
+    @GetMapping("/get")
+    public AjaxResult<SysSetting> get(String code){
+        return AjaxResult.data(sysSettingServiceImpl.getOne(new LambdaQueryWrapper<SysSetting>().eq(SysSetting::getCode,code)));
+    }
+
+    @GetMapping("/test")
+    public AjaxResult<String> test(){
+        return AjaxResult.data(SpringUtils.getHost());
+    }
 }

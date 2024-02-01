@@ -1,7 +1,6 @@
 package org.demo.oss.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.demo.oss.config.entity.OssProp;
 import org.demo.oss.storage.StorageMode;
 import org.demo.oss.utils.FileUtils;
 import org.demo.oss.utils.ImageUtils;
@@ -25,7 +24,7 @@ public class LocalMode implements StorageMode {
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    private final String host = SpringUtils.getBean(OssProp.class).getHost();
+    private final String host = SpringUtils.getHost();
 
     private final String uploadPath = SpringUtils.getProperty("web.resource-path");
 

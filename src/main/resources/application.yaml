@@ -16,27 +16,6 @@ spring:
     username: root
     password: 123456
 
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
-
-# 上传文件配置
-upload:
-  # 选择要使用的文件存储服务
-  storage: minio
-  #  storage: local
-  # minio服务文件域名（自定义，可以设置成你自己的域名）
-  host: http://127.0.0.1:9001
-  #  host: http://localhost:8000
-  #minio服务地址
-  endpoint: http://127.0.0.1:9001
-  #用户名
-  accessKey: admin
-  #密码
-  secretKey: minioadmin
-  #桶名称
-  bucketName: files
-
 web:
   # 上传文件存储路径
   resource-path: D:/image/

@@ -10,9 +10,9 @@
     </parent>
     <groupId>org.demo</groupId>
     <artifactId>oss</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>oss</name>
-    <description>OSS练习</description>
+    <description>OSS简化版</description>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>

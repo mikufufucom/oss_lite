@@ -1,12 +1,13 @@
 package org.demo.oss.utils;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.demo.oss.config.OssConfig;
-import org.demo.oss.config.entity.OssProp;
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.Item;
+import org.demo.oss.model.Storage;
+import org.demo.oss.service.StorageService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -26,12 +27,19 @@ public class MinioUtils {
      * 获取配置的Minio客户端
      * @return Minio客户端
      */
-    private static MinioClient getMinioClient(){
-        return SpringUtils.getBean(OssConfig.class).getMinioClient();
+    public static MinioClient getMinioClient(){
+        Storage storage = getOssProp();
+        if (storage != null) {
+            return MinioClient.builder()
+                    .endpoint(storage.getEndpoint())
+                    .credentials(storage.getAccessKey(), storage.getSecretKey())
+                    .build();
+        }
+        return null;
     }
 
-    private static OssProp getOssProp(){
-        return SpringUtils.getBean(OssConfig.class).getOssProp();
+    private static Storage getOssProp(){
+        return SpringUtils.getBean(StorageService.class).getOne(new QueryWrapper<Storage>().lambda().eq(Storage::getStorage, "minio"));
     }
 
     /**

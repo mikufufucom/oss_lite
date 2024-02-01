@@ -1,6 +1,5 @@
 package org.demo.oss.service.impl;
 
-import org.demo.oss.config.entity.OssProp;
 import org.demo.oss.config.enums.StorageType;
 import org.demo.oss.config.enums.UploadFileType;
 import org.demo.oss.service.SysSettingService;
@@ -30,9 +29,6 @@ import java.util.Objects;
 @Service
 public class UploadServiceImpl implements UploadService {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    @Autowired
-    private OssProp ossProp;
     @Autowired
     private SysSettingService settingService;
 
@@ -42,7 +38,7 @@ public class UploadServiceImpl implements UploadService {
             log.info("当前存储服务商为：{}",storage);
             return storage;
         }
-        return ossProp.getStorage();
+        return null;
     }
 
     @Override
