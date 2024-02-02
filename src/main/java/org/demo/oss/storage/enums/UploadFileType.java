@@ -1,4 +1,4 @@
-package org.demo.oss.config.enums;
+package org.demo.oss.storage.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

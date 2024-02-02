@@ -1,7 +1,7 @@
 package org.demo.oss.service.impl;
 
-import org.demo.oss.config.enums.StorageType;
-import org.demo.oss.config.enums.UploadFileType;
+import org.demo.oss.storage.enums.StorageType;
+import org.demo.oss.storage.enums.UploadFileType;
 import org.demo.oss.service.SysSettingService;
 import org.demo.oss.service.UploadService;
 import lombok.extern.slf4j.Slf4j;

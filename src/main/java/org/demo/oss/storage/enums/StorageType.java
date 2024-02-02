@@ -1,4 +1,4 @@
-package org.demo.oss.config.enums;
+package org.demo.oss.storage.enums;
 
 import org.demo.oss.storage.StorageMode;
 import org.demo.oss.storage.impl.LocalMode;
