@@ -2,8 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.demo.oss.mapper.SysSettingMapper">
   <resultMap id="BaseResultMap" type="org.demo.oss.model.SysSetting">
-    <!--@mbg.generated-->
-    <!--@Table sys_setting-->
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="code" jdbcType="VARCHAR" property="code" />
     <result column="name" jdbcType="VARCHAR" property="name" />
@@ -11,8 +9,4 @@
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="status" jdbcType="INTEGER" property="status" />
   </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    id, code, `name`, description, `value`, `status`
-  </sql>
 </mapper>
