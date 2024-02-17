@@ -28,7 +28,7 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class UploadServiceImpl implements UploadService {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final  SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private SysSettingService settingService;
 
@@ -50,7 +50,7 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public Map<String,String> upload(MultipartFile multipartFile, String pathName) {
-        String dateString = simpleDateFormat.format(System.currentTimeMillis());
+        String dateString = SIMPLE_DATE_FORMAT.format(System.currentTimeMillis());
         String fileName = dateString + "_" + multipartFile.getOriginalFilename();
 //        return StorageType.getStorageMode(getStorage()).upload(multipartFile,pathName,fileName);
         InputStream inputStream = null;

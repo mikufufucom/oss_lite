@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>org.demo</groupId>
-    <artifactId>oss</artifactId>
+    <artifactId>oss_lite</artifactId>
     <version>0.0.1</version>
     <name>oss</name>
     <description>OSS简化版</description>
