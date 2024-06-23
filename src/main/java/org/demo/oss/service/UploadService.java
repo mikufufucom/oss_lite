@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * 文件服务接口
+ * @author moxiaoli
  */
 public interface UploadService {
 
@@ -54,4 +55,11 @@ public interface UploadService {
      * @return 对象列表信息
      */
     List<Map<String,String>> listObjects(String objectNamePrefix, Boolean isSubDir);
+
+    /**
+     * 获取该前缀的对象列表信息
+     * @param objectNamePrefix 对象名前缀
+     * @return 对象列表信息
+     */
+    List<Map<String,String>> list(String objectNamePrefix);
 }

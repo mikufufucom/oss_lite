@@ -1,6 +1,5 @@
 package org.demo.oss.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -16,7 +15,6 @@ import java.net.UnknownHostException;
  * Spring工具类
  */
 @Component
-@Slf4j
 public class SpringUtils implements BeanFactoryAware, EnvironmentAware {
 
     private static BeanFactory bean;
@@ -57,7 +55,7 @@ public class SpringUtils implements BeanFactoryAware, EnvironmentAware {
      */
     public static String getHost(){
         try {
-            return InetAddress.getLocalHost().getHostAddress() + ":" + env.getProperty("server.port");
+            return InetAddress.getLocalHost().getHostAddress() + ":" + getProperty("server.port");
         } catch (UnknownHostException e) {
             throw new RuntimeException("获取当前环境的ip失败");
         }

@@ -1,9 +1,9 @@
 package org.demo.oss.storage.enums;
 
 import org.demo.oss.storage.StorageMode;
-import org.demo.oss.storage.impl.LocalMode;
-import org.demo.oss.storage.impl.MinioMode;
-import org.demo.oss.storage.impl.OssMode;
+import org.demo.oss.storage.LocalMode;
+import org.demo.oss.storage.MinioMode;
+import org.demo.oss.storage.OssMode;
 import org.demo.oss.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

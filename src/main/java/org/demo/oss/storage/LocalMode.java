@@ -1,7 +1,6 @@
-package org.demo.oss.storage.impl;
+package org.demo.oss.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.demo.oss.storage.StorageMode;
 import org.demo.oss.utils.FileUtils;
 import org.demo.oss.utils.ImageUtils;
 import org.demo.oss.utils.SpringUtils;
@@ -14,10 +13,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * 本地存储模式实现类
+ * @author moxiaoli
  */
 @Slf4j
 public class LocalMode implements StorageMode {
@@ -29,9 +30,24 @@ public class LocalMode implements StorageMode {
     private final String uploadPath = SpringUtils.getProperty("web.resource-path");
 
     @Override
+    public String upload(MultipartFile multipartFile) {
+        return upload(multipartFile,  multipartFile.getOriginalFilename());
+    }
+
+    @Override
+    public String upload(MultipartFile multipartFile, String objectName) {
+        return upload(multipartFile, "", objectName);
+    }
+
+    @Override
+    public String upload(String pathName, MultipartFile multipartFile) {
+        return upload(multipartFile, pathName, multipartFile.getOriginalFilename());
+    }
+
+    @Override
     public String upload(MultipartFile multipartFile, String pathName, String objectName) {
         if (null == multipartFile || 0 == multipartFile.getSize()) {
-            return null;
+            throw new RuntimeException("文件不能为空");
         }
         try {
             String filePath = uploadPath + pathName;
@@ -44,8 +60,8 @@ public class LocalMode implements StorageMode {
             return host + "/" + pathName + "/" + objectName;
         } catch (Exception e) {
             log.error("文件上传失败", e);
+            throw new RuntimeException("文件上传失败");
         }
-        return null;
     }
 
     @Override
@@ -63,6 +79,7 @@ public class LocalMode implements StorageMode {
             return host + "/" + pathName + "/" + objectName;
         } catch (Exception e) {
             log.error("文件上传失败", e);
+            throw new RuntimeException("文件上传失败");
         }finally {
             if (null != inputStream){
                 try {
@@ -72,13 +89,12 @@ public class LocalMode implements StorageMode {
                 }
             }
         }
-        return null;
     }
 
     @Override
     public InputStream download(String objectName) {
         if (StringUtils.isBlank(objectName)) {
-            return null;
+            throw new RuntimeException("文件名不能为空");
         }
         try {
             // 本地文件路径
@@ -90,12 +106,12 @@ public class LocalMode implements StorageMode {
     }
 
     @Override
-    public Boolean delete(String fileName) {
-        if (StringUtils.isBlank(fileName)) {
+    public Boolean delete(String objectName) {
+        if (StringUtils.isBlank(objectName)) {
             return false;
         }
         try {
-            File file = new File(uploadPath + fileName);
+            File file = new File(uploadPath + objectName);
             if (file.exists()) {
                 return file.delete();
             }
@@ -109,21 +125,31 @@ public class LocalMode implements StorageMode {
     @Override
     public String getObjectUrl(String objectName) {
         if (StringUtils.isBlank(objectName)) {
-            return null;
+            throw new RuntimeException("文件名不能为空");
         }
         return host + "/" + objectName;
     }
 
     @Override
+    public String getObjectUrl(String objectName, Integer duration, TimeUnit unit) {
+        return getObjectUrl(objectName);
+    }
+
+    @Override
+    public String getObjectUrlLong(String objectName) {
+        return getObjectUrl(objectName);
+    }
+
+    @Override
     public List<Map<String, String>> listObjects(String objectNamePrefix, Boolean isSubDir) {
         if (StringUtils.isBlank(objectNamePrefix)) {
-            return null;
+            throw new RuntimeException("文件名不能为空");
         }
         try {
             // 本地文件路径
             File file = new File(uploadPath + objectNamePrefix);
             if (!file.exists()) {
-                return null;
+                throw new RuntimeException("文件不存在");
             }
             return Arrays.stream(Objects.requireNonNull(file.list())).map(fileName -> {
                 Map<String, String> map = new HashMap<>();
@@ -137,5 +163,35 @@ public class LocalMode implements StorageMode {
             log.error("文件列表获取失败", e);
             throw new RuntimeException("文件列表获取失败");
         }
+    }
+
+    @Override
+    public List<Map<String, String>> listObjects(String objectNamePrefix, Integer maxKeys, Boolean isSubDir) {
+        if (StringUtils.isBlank(objectNamePrefix)) {
+            throw new RuntimeException("文件名不能为空");
+        }
+        try {
+            // 本地文件路径
+            File file = new File(uploadPath + objectNamePrefix);
+            if (!file.exists()) {
+                throw new RuntimeException("文件不存在");
+            }
+            return Arrays.stream(Objects.requireNonNull(file.list())).map(fileName -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("name", objectNamePrefix + "/" + fileName);
+                map.put("url", host + "/" + objectNamePrefix + "/" + fileName);
+                map.put("size", FileUtils.convertFileSize(new File(uploadPath + objectNamePrefix + "/" + fileName).length()));
+                map.put("lastModified",SIMPLE_DATE_FORMAT.format(new Date(new File(uploadPath + objectNamePrefix + fileName).lastModified())));
+                return map;
+            }).collect(Collectors.toList()).subList(0, maxKeys);
+        } catch (Exception e) {
+            log.error("文件列表获取失败", e);
+            throw new RuntimeException("文件列表获取失败");
+        }
+    }
+
+    @Override
+    public List<Map<String, String>> listObjects(String objectNamePrefix) {
+        return listObjects(objectNamePrefix, false);
     }
 }

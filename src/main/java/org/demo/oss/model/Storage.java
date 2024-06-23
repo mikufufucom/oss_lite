@@ -24,6 +24,12 @@ public class Storage implements Serializable {
     private String storage;
 
     /**
+     * 对象存储服务的类型（1.minio，2.oss，3.local）
+     */
+    @TableField(value = "storage_type")
+    private Integer storageType;
+
+    /**
      * 对象存储服务商名称
      */
     @TableField(value = "storage_name")

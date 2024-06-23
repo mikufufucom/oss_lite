@@ -1,9 +1,8 @@
-package org.demo.oss.utils;
+package org.demo.oss.storage;
 
-import com.aliyun.oss.OSSClientBuilder;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.ListObjectsRequest;
 import com.aliyun.oss.model.OSSObjectSummary;
@@ -11,6 +10,9 @@ import com.aliyun.oss.model.ObjectListing;
 import lombok.extern.slf4j.Slf4j;
 import org.demo.oss.model.Storage;
 import org.demo.oss.service.StorageService;
+import org.demo.oss.utils.FileUtils;
+import org.demo.oss.utils.SpringUtils;
+import org.demo.oss.utils.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,18 +26,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 阿里OSS 工具类
+ * 阿里OSS存储模式实现类
+ * @author moxiaoli
  */
 @Slf4j
-public class OssUtils {
+public class OssMode implements StorageMode {
 
-    private static final  SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * 获取配置的阿里OSS客户端
      * @return 阿里OSS客户端
      */
-    public static OSS getOssClient(){
+    public OSS getOssClient(){
         Storage storage = getOssProp();
         if (storage != null) {
             return new OSSClientBuilder().build(
@@ -44,37 +47,45 @@ public class OssUtils {
                     storage.getSecretKey()
             );
         }
-        return null;
+        throw new RuntimeException("未配置minio");
     }
 
-    private static Storage getOssProp(){
-        return SpringUtils.getBean(StorageService.class).getOne(new QueryWrapper<Storage>().lambda().eq(Storage::getStorage, "oss"));
+    private Storage getOssProp(){
+        return SpringUtils.getBean(StorageService.class).getStorage();
+    }
+
+    @Override
+    public String upload(MultipartFile multipartFile) {
+        // 判断上传文件是否为空
+        if (null == multipartFile || 0 == multipartFile.getSize()) {
+            throw new RuntimeException("文件不能为空");
+        }
+        return upload(multipartFile, multipartFile.getOriginalFilename());
+    }
+
+    @Override
+    public String upload(MultipartFile multipartFile, String objectName) {
+        if(isExist(objectName)){
+            return getObjectUrlLong(objectName);
+        }else {
+            // 判断上传文件是否为空
+            if (null == multipartFile || 0 == multipartFile.getSize()) {
+                throw new RuntimeException("文件不能为空");
+            }
+            return upload(multipartFile, "", objectName);
+        }
     }
 
     /**
-     * 阿里OSS服务 上传文件
-     * @param multipartFile spring的封装文件流
-     * @param pathName 文件路径
-     * @param objectName 文件名称
-     * @return 文件上传路径
+     * 阿里OSS 判断文件是否已存在
+     *  @param objectName 文件名称
+     * @return 文件是否存在 如果返回值为true，则文件存在，否则存储空间或者文件不存在。
      */
-    public static String upload(MultipartFile multipartFile,String pathName,String objectName){
-        if (null == multipartFile || 0 == multipartFile.getSize()) {
-            return null;
-        }
-        InputStream inputStream = null;
+    public boolean isExist(String objectName){
         try {
-            inputStream = multipartFile.getInputStream();
-            getOssClient().putObject(
-                    getOssProp().getBucketName(),
-                    pathName + "/" + objectName,
-                    inputStream
-            );
-            if (StringUtils.isBlank(pathName)) {
-                return getOssProp().getHost() + "/" + objectName;
-            }
-            return getOssProp().getHost() + "/" + pathName + "/" + objectName;
-        } catch (OSSException oe){
+            // 判断oss上文件是否存在
+            return getOssClient().doesObjectExist(getOssProp().getBucketName(), objectName);
+        }catch (OSSException oe){
             log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
                     + "但是由于某种原因以错误响应被拒绝。");
             log.error("Error Message:" + oe.getErrorMessage());
@@ -86,11 +97,62 @@ public class OssUtils {
                     + "在尝试与OSS通信时出现了严重的内部问题，"
                     + "例如不能接入网络。");
             log.error("Error Message:" + ce.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public String upload(String pathName, MultipartFile multipartFile) {
+        // 判断上传文件是否为空
+        if (null == multipartFile || 0 == multipartFile.getSize()) {
+            throw new RuntimeException("文件不能为空");
+        }
+        return upload(multipartFile, pathName, multipartFile.getOriginalFilename());
+    }
+
+    @Override
+    public String upload(MultipartFile multipartFile, String pathName, String objectName) {
+        // 判断上传文件是否为空
+        if (null == multipartFile || 0 == multipartFile.getSize()) {
+            throw new RuntimeException("文件不能为空");
+        }
+        InputStream inputStream = null;
+        try {
+            inputStream = multipartFile.getInputStream();
+            // 上传文件
+            getOssClient().putObject(
+                    // 存储空间
+                    getOssProp().getBucketName(),
+                    // 上传的文件名
+                    pathName + "/" + objectName,
+                    // 上传文件的输入流
+                    inputStream
+            );
+            // 返回文件上传路径
+            if (StringUtils.isBlank(pathName)) {
+                return getOssProp().getHost() + "/" + objectName;
+            }
+            return getOssProp().getHost() + "/" + pathName + "/" + objectName;
+        } catch (OSSException oe){
+            log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
+                    + "但是由于某种原因以错误响应被拒绝。");
+            log.error("Error Message:" + oe.getErrorMessage());
+            log.error("Error Code:" + oe.getErrorCode());
+            log.error("Request ID:" + oe.getRequestId());
+            log.error("Host ID:" + oe.getHostId());
+            throw new RuntimeException("上传失败");
+        }catch (ClientException ce){
+            log.error("捕获ClientException，这意味着客户端遇到"
+                    + "在尝试与OSS通信时出现了严重的内部问题，"
+                    + "例如不能接入网络。");
+            log.error("Error Message:" + ce.getMessage());
+            throw new RuntimeException("上传失败");
         }catch (IOException ioe){
             log.error("捕获IOException，这意味着客户端遇到"
                     + "在尝试与OSS通信时出现了严重的内部问题，"
                     + "例如不能接入网络。");
             log.error("Error Message:" + ioe.getMessage());
+            throw new RuntimeException("上传失败");
         }finally {
             if (null != inputStream){
                 try {
@@ -100,17 +162,10 @@ public class OssUtils {
                 }
             }
         }
-        return null;
     }
 
-    /**
-     * 阿里OSS服务 上传文件
-     * @param inputStream {@link InputStream}文件流 实现时注意关闭流
-     * @param pathName 文件路径
-     * @param objectName 文件名称
-     * @return 文件上传路径
-     */
-    public static String upload(InputStream inputStream,String pathName,String objectName){
+    @Override
+    public String upload(InputStream inputStream, String pathName, String objectName) {
         try {
             getOssClient().putObject(
                     getOssProp().getBucketName(),
@@ -128,11 +183,13 @@ public class OssUtils {
             log.error("Error Code:" + oe.getErrorCode());
             log.error("Request ID:" + oe.getRequestId());
             log.error("Host ID:" + oe.getHostId());
+            throw new RuntimeException("上传失败");
         }catch (ClientException ce){
             log.error("捕获ClientException，这意味着客户端遇到"
                     + "在尝试与OSS通信时出现了严重的内部问题，"
                     + "例如不能接入网络。");
             log.error("Error Message:" + ce.getMessage());
+            throw new RuntimeException("上传失败");
         } finally {
             if (null != inputStream){
                 try {
@@ -142,16 +199,34 @@ public class OssUtils {
                 }
             }
         }
-        return null;
     }
 
-    /**
-     * 阿里OSS服务 删除文件
-     * @param objectName 文件名称 有路径需要带路径
-     * @return 删除成功返回true，失败返回false
-     */
-    public static Boolean delete(String objectName) {
+    @Override
+    public InputStream download(String objectName) {
         try {
+            // 下载文件
+            return getOssClient().getObject(getOssProp().getBucketName(), objectName).getObjectContent();
+        } catch (OSSException oe) {
+            log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
+                    + "但是由于某种原因以错误响应被拒绝。");
+            log.error("Error Message:" + oe.getErrorMessage());
+            log.error("Error Code:" + oe.getErrorCode());
+            log.error("Request ID:" + oe.getRequestId());
+            log.error("Host ID:" + oe.getHostId());
+            throw new RuntimeException("下载文件失败");
+        } catch (ClientException ce) {
+            log.error("捕获ClientException，这意味着客户端遇到"
+                    + "在尝试与OSS通信时出现了严重的内部问题，"
+                    + "例如不能接入网络。");
+            log.error("Error Message:" + ce.getMessage());
+            throw new RuntimeException("下载文件失败");
+        }
+    }
+
+    @Override
+    public Boolean delete(String objectName) {
+        try {
+            // 删除文件
             getOssClient().deleteObject(getOssProp().getBucketName(), objectName);
             return true;
         } catch (OSSException oe) {
@@ -170,41 +245,17 @@ public class OssUtils {
         return false;
     }
 
-    /**
-     * 阿里OSS服务 下载文件
-     * @param objectName 文件名称 有路径需要带路径
-     * @return 文件的二进制流
-     */
-    public static InputStream download(String objectName) {
-        try {
-            return getOssClient().getObject(getOssProp().getBucketName(), objectName).getObjectContent();
-        } catch (OSSException oe) {
-            log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
-                    + "但是由于某种原因以错误响应被拒绝。");
-            log.error("Error Message:" + oe.getErrorMessage());
-            log.error("Error Code:" + oe.getErrorCode());
-            log.error("Request ID:" + oe.getRequestId());
-            log.error("Host ID:" + oe.getHostId());
-        } catch (ClientException ce) {
-            log.error("捕获ClientException，这意味着客户端遇到"
-                    + "在尝试与OSS通信时出现了严重的内部问题，"
-                    + "例如不能接入网络。");
-            log.error("Error Message:" + ce.getMessage());
-        }
-        return null;
+    @Override
+    public String getObjectUrl(String objectName) {
+        return getObjectUrl(objectName, 7, TimeUnit.DAYS);
     }
 
-    /**
-     * 阿里OSS服务 获取文件外链
-     * @param objectName 文件名称 有路径需要带路径
-     * @param duration 有效大小 例如 7 表示7个单位时间
-     * @param unit TimeUnit 有效时间的单位 例如 DAYS表示天数
-     * @return 文件外链
-     */
-    public static String getObjectUrl(String objectName, Integer duration, TimeUnit unit) {
+    @Override
+    public String getObjectUrl(String objectName, Integer duration, TimeUnit unit) {
         try {
             return getOssClient().generatePresignedUrl(getOssProp().getBucketName(),
                     objectName,
+                    // 设置URL过期时间
                     new Date(System.currentTimeMillis() + unit.toMillis(duration))
             ).toString();
         } catch (OSSException oe) {
@@ -214,42 +265,68 @@ public class OssUtils {
             log.error("Error Code:" + oe.getErrorCode());
             log.error("Request ID:" + oe.getRequestId());
             log.error("Host ID:" + oe.getHostId());
+            throw new RuntimeException("获取外链失败");
         } catch (ClientException ce) {
             log.error("捕获ClientException，这意味着客户端遇到"
                     + "在尝试与OSS通信时出现了严重的内部问题，"
                     + "例如不能接入网络。");
             log.error("Error Message:" + ce.getMessage());
+            throw new RuntimeException("获取外链失败");
         }
-        return null;
     }
 
-    /**
-     * 阿里OSS服务 获取文件外链 默认7天
-     * @param objectName 文件名称 有路径需要带路径
-     * @return 文件外链
-     */
-    public static String getObjectUrl(String objectName) {
-        return getObjectUrl(objectName, 7, TimeUnit.DAYS);
+    @Override
+    public String getObjectUrlLong(String objectName) {
+        try {
+            // 判断文件是否存在。如果返回值为true，则文件存在，否则存储空间或者文件不存在。
+            boolean exist = getOssClient().doesObjectExist(getOssProp().getBucketName(), objectName);
+            if (exist) {
+                // 获取文件外链
+                return getOssProp().getHost() + "/" + objectName;
+            }
+            throw new RuntimeException("文件不存在");
+        } catch (OSSException oe) {
+            log.error("捕获到OSSException，这意味着您的请求已发送到OSS， "
+                    + "但是由于某种原因以错误响应被拒绝。");
+            log.error("Error Message:" + oe.getErrorMessage());
+            log.error("Error Code:" + oe.getErrorCode());
+            log.error("Request ID:" + oe.getRequestId());
+            log.error("Host ID:" + oe.getHostId());
+            throw new RuntimeException("获取外链失败");
+        } catch (ClientException ce) {
+            log.error("捕获ClientException，这意味着客户端遇到"
+                    + "在尝试与OSS通信时出现了严重的内部问题，"
+                    + "例如不能接入网络。");
+            log.error("Error Message:" + ce.getMessage());
+            throw new RuntimeException("获取外链失败");
+        }
     }
 
-    /**
-     * 阿里OSS服务 列出桶的对象列表信息
-     * @param objectNamePrefix 对象名前缀
-     * @param maxKeys 最大值
-     * @return 对象列表信息
-     */
-    public static List<Map<String,String>> listObjects(String objectNamePrefix, Integer maxKeys) {
+    @Override
+    public List<Map<String, String>> listObjects(String objectNamePrefix, Boolean isSubDir) {
+        return listObjects(objectNamePrefix, 100, isSubDir);
+    }
+
+    @Override
+    public List<Map<String, String>> listObjects(String objectNamePrefix, Integer maxKeys, Boolean isSubDir) {
         try {
             ListObjectsRequest listObjectsRequest = new ListObjectsRequest(getOssProp().getBucketName())
+                    // 列举文件。objectNamePrefix，则列举存储空间下的所有文件。objectNamePrefix，则列举包含指定前缀的文件。
                     .withPrefix(objectNamePrefix)
+                    // 设置最大个数。
                     .withMaxKeys(maxKeys);
             ObjectListing objectListing = getOssClient().listObjects(listObjectsRequest);
+            // 遍历所有文件。
             List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
+            // 获取该资源空间下所有objectName 例如：[test/1.txt, test/2.txt]
+            // stream().map()方法是将list中的每一个元素映射成一个新的元素，然后将这些新的元素组成一个Stream流。
+            // collect(Collectors.toList())方法是将流中的元素收集到List中。
+//            return sums.stream().map(OSSObjectSummary::getKey).collect(Collectors.toList());
             return sums.stream().map(ossObject -> {
                 Map<String,String> map = new HashMap<>();
                 map.put("name",ossObject.getKey());
                 map.put("url",getOssProp().getHost() + "/" + ossObject.getKey());
-                map.put("size",FileUtils.convertFileSize(ossObject.getSize()));
+                map.put("size", FileUtils.convertFileSize(ossObject.getSize()));
                 map.put("lastModified",SIMPLE_DATE_FORMAT.format(ossObject.getLastModified()));
                 return map;
             }).collect(Collectors.toList());
@@ -260,21 +337,24 @@ public class OssUtils {
             log.error("Error Code:" + oe.getErrorCode());
             log.error("Request ID:" + oe.getRequestId());
             log.error("Host ID:" + oe.getHostId());
+            throw new RuntimeException("获取对象存储列表失败");
         } catch (ClientException ce) {
             log.error("捕获ClientException，这意味着客户端遇到"
                     + "在尝试与OSS通信时出现了严重的内部问题，"
                     + "例如不能接入网络。");
             log.error("Error Message:" + ce.getMessage());
+            throw new RuntimeException("获取对象存储列表失败");
         }
-        return null;
+//        finally {
+//            // 关闭OSSClient。
+//            if (ossClient != null) {
+//                ossClient.shutdown();
+//            }
+//        }
     }
 
-    /**
-     * 阿里OSS服务 列出桶的对象列表信息 默认100条
-     * @param objectNamePrefix 对象名前缀
-     * @return 对象列表信息
-     */
-    public static List<Map<String,String>> listObjects(String objectNamePrefix) {
-        return listObjects(objectNamePrefix, 100);
+    @Override
+    public List<Map<String, String>> listObjects(String objectNamePrefix) {
+        return listObjects(objectNamePrefix, 100,false);
     }
 }

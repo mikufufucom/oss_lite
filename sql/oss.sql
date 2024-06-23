@@ -11,7 +11,7 @@
  Target Server Version : 80032 (8.0.32)
  File Encoding         : 65001
 
- Date: 29/01/2024 14:15:34
+ Date: 24/06/2024 01:10:50
 */
 
 create database IF NOT EXISTS `oss` default character set utf8mb4 COLLATE utf8mb4_0900_ai_ci;
@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS `storage`;
 CREATE TABLE `storage`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `storage` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '对象存储服务商（目前支持阿里云、minio和本地）',
+  `storage_type` int NULL DEFAULT NULL COMMENT '对象存储服务的类型（1.minio，2.oss，3.local）',
   `storage_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '对象存储服务商名称',
   `host` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '外链访问地址',
   `endpoint` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'API访问地址',
@@ -41,8 +42,8 @@ CREATE TABLE `storage`  (
 -- ----------------------------
 -- Records of storage
 -- ----------------------------
-INSERT INTO `storage` VALUES (1, 'minio', 'minIO存储', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'admin', 'minioadmin', 'files', 'https://minio.moxiaoli.cn/files/icon/minio.png');
-INSERT INTO `storage` VALUES (2, 'oss', '阿里oss存储服务', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'minioadmin', 'minioadmin', 'files', 'https://minio.moxiaoli.cn/files/icon/%E9%98%BF%E9%87%8COSS.png');
+INSERT INTO `storage` VALUES (1, 'minio', 1, 'minIO存储', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'admin', 'minioadmin', 'files', 'https://minio.moxiaoli.cn/files/icon/minio.png');
+INSERT INTO `storage` VALUES (2, 'oss', 2, '阿里oss存储服务', 'http://127.0.0.1:9001', 'http://127.0.0.1:9001', 'minioadmin', 'minioadmin', 'files', 'https://minio.moxiaoli.cn/files/icon/%E9%98%BF%E9%87%8COSS.png');
 
 -- ----------------------------
 -- Table structure for sys_setting
@@ -61,6 +62,6 @@ CREATE TABLE `sys_setting`  (
 -- ----------------------------
 -- Records of sys_setting
 -- ----------------------------
-INSERT INTO `sys_setting` VALUES (1, 'storage', '存储桶配置', '用于配置对象存储服务商', 'minio', 0);
+INSERT INTO `sys_setting` VALUES (1, 'storage', '存储桶配置', '用于配置对象存储服务商', 'oss', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
