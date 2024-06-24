@@ -11,7 +11,7 @@
     <groupId>org.demo</groupId>
     <artifactId>oss_lite</artifactId>
     <version>0.0.1</version>
-    <name>oss</name>
+    <name>oss_lite</name>
     <description>OSS简化版</description>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
